@@ -1,0 +1,11 @@
+controller:
+  ros__parameters:
+    world_frame: 'world'
+    agent_frame: 'agent'
+    timer_period: 0.1
+
+agent_body:
+  ros__parameters:
+    world_frame: 'world'
+    agent_frame: 'agent'
+    timer_period: 0.1
