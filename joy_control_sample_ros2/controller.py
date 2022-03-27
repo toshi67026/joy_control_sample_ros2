@@ -15,18 +15,12 @@ class Controller(Node):
         super().__init__("controller")
 
         self.joy_sub = self.create_subscription(Joy, "joy", self.joy_callback, 10)
-        self.curr_pose_sub = self.create_subscription(
-            Pose, "curr_pose", self.curr_pose_callback, 10
-        )
+        self.curr_pose_sub = self.create_subscription(Pose, "curr_pose", self.curr_pose_callback, 10)
         # get frame name
         self.declare_parameter("world_frame", "world")
-        self.world_frame = (
-            self.get_parameter("world_frame").get_parameter_value().string_value
-        )
+        self.world_frame = self.get_parameter("world_frame").get_parameter_value().string_value
         self.declare_parameter("agent_frame", "agent")
-        self.agent_frame = (
-            self.get_parameter("agent_frame").get_parameter_value().string_value
-        )
+        self.agent_frame = self.get_parameter("agent_frame").get_parameter_value().string_value
 
         # set for tf
         self.tf_buffer = Buffer()
@@ -34,9 +28,7 @@ class Controller(Node):
 
         self.cmd_vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
         self.declare_parameter("timer_period", 0.01)
-        self.timer_period = (
-            self.get_parameter("timer_period").get_parameter_value().double_value
-        )
+        self.timer_period = self.get_parameter("timer_period").get_parameter_value().double_value
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
 
         self.cmd_vel_in_agent_coord = Twist()
@@ -52,14 +44,12 @@ class Controller(Node):
         quat = msg.orientation
         _, _, yaw = euler_from_quaternion(quaternion=[quat.x, quat.y, quat.z, quat.w])
         theta = yaw + self.cmd_vel_in_agent_coord.angular.z
-        self.cmd_vel_in_world_coord.linear.x = (
-            self.cmd_vel_in_agent_coord.linear.x * np.cos(theta)
-            - self.cmd_vel_in_agent_coord.linear.y * np.sin(theta)
-        )
-        self.cmd_vel_in_world_coord.linear.y = (
-            self.cmd_vel_in_agent_coord.linear.x * np.sin(theta)
-            + self.cmd_vel_in_agent_coord.linear.y * np.cos(theta)
-        )
+        self.cmd_vel_in_world_coord.linear.x = self.cmd_vel_in_agent_coord.linear.x * np.cos(
+            theta
+        ) - self.cmd_vel_in_agent_coord.linear.y * np.sin(theta)
+        self.cmd_vel_in_world_coord.linear.y = self.cmd_vel_in_agent_coord.linear.x * np.sin(
+            theta
+        ) + self.cmd_vel_in_agent_coord.linear.y * np.cos(theta)
         self.cmd_vel_in_world_coord.angular.z = self.cmd_vel_in_agent_coord.angular.z
 
     def timer_callback(self) -> None:
