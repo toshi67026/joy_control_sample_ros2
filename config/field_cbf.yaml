@@ -1,17 +1,22 @@
 controller:
   ros__parameters:
-    world_frame: 'world'
-    agent_frame: 'agent'
+    world_frame: "world"
+    agent_frame: "agent"
     timer_period: 0.1
+
+cbf_optimizer:
+  ros__parameters:
+    world_frame: "world"
     activate_field_cbf: True
+    timer_period: 0.1
     field:
-      x_limit: [0.0, 1.0]
-      y_limit: [1.0, 2.0]
+      x_limit: [0.0, 2.0]
+      y_limit: [1.0, 3.0]
       theta: 0.0
       keep_inside: False
 
 agent_body:
   ros__parameters:
-    world_frame: 'world'
-    agent_frame: 'agent'
+    world_frame: "world"
+    agent_frame: "agent"
     timer_period: 0.1

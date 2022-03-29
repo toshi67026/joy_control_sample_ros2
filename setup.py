@@ -27,6 +27,7 @@ setup(
         "console_scripts": [
             "controller = joy_control_sample_ros2.controller:main",
             "agent_body = joy_control_sample_ros2.agent_body:main",
+            "cbf_optimizer = joy_control_sample_ros2.cbf_optimizer:main",
         ],
     },
 )

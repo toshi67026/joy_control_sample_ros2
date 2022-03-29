@@ -24,6 +24,9 @@ def generate_launch_description() -> LaunchDescription:
         package="joy_control_sample_ros2",
         executable="controller",
         name="controller",
+        remappings=[
+            ("cmd_vel", "cmd_vel_nom")
+        ],
         parameters=[params],
     )
 
@@ -31,6 +34,16 @@ def generate_launch_description() -> LaunchDescription:
         package="joy_control_sample_ros2",
         executable="agent_body",
         name="agent_body",
+        remappings=[
+            ("cmd_vel", "cmd_vel_opt")
+        ],
+        parameters=[params],
+    )
+
+    cbf_optimizer_node = Node(
+        package="joy_control_sample_ros2",
+        executable="cbf_optimizer",
+        name="cbf_optimizer",
         parameters=[params],
     )
 
@@ -48,6 +61,7 @@ def generate_launch_description() -> LaunchDescription:
     ld.add_action(joy_node)
     ld.add_action(controller_node)
     ld.add_action(agent_body_node)
+    ld.add_action(cbf_optimizer_node)
     ld.add_action(rviz2_node)
 
     return ld
