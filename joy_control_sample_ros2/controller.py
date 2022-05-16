@@ -15,12 +15,6 @@ class Controller(Node):
         self.joy_sub = self.create_subscription(Joy, "joy", self.joy_callback, 10)
         self.curr_pose_sub = self.create_subscription(Pose, "curr_pose", self.curr_pose_callback, 10)
 
-        # get frame name
-        self.declare_parameter("world_frame", "world")
-        self.world_frame = self.get_parameter("world_frame").get_parameter_value().string_value
-        self.declare_parameter("agent_frame", "agent")
-        self.agent_frame = self.get_parameter("agent_frame").get_parameter_value().string_value
-
         self.declare_parameter("timer_period", 0.01)
         self.timer_period = self.get_parameter("timer_period").get_parameter_value().double_value
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
