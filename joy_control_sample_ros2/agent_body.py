@@ -1,26 +1,17 @@
 #!/usr/bin/env python3
 
 import rclpy
-from geometry_msgs.msg import (
-    Point,
-    Pose,
-    Quaternion,
-    Transform,
-    Vector3,
-    TransformStamped,
-    Twist,
-)
+from geometry_msgs.msg import Point, Pose, Quaternion, Transform, TransformStamped, Twist, Vector3
 from rclpy.node import Node
 from std_msgs.msg import Header
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_broadcaster import TransformBroadcaster
-from tf2_ros.transform_listener import TransformListener
 from tf_transformations import euler_from_quaternion, quaternion_from_euler
 
 
 class AgentBody(Node):
     def __init__(self) -> None:
-        super().__init__("AgentBody")
+        super().__init__("agent_body")
 
         self.cmd_vel_sub = self.create_subscription(Twist, "cmd_vel", self.cmd_vel_callback, 10)
         self.curr_pose_pub = self.create_publisher(Pose, "curr_pose", 10)
@@ -32,24 +23,30 @@ class AgentBody(Node):
         self.declare_parameter("agent_frame", "agent")
         self.agent_frame = self.get_parameter("agent_frame").get_parameter_value().string_value
 
+        # tf2
         self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self)
         self.broadcaster = TransformBroadcaster(self)
-        self.declare_parameter("timer_period", 0.01)
-        self.timer_period = self.get_parameter("timer_period").get_parameter_value().double_value
+
+        self.declare_parameter("sampling_time", 0.01)
+        self.sampling_time = self.get_parameter("sampling_time").get_parameter_value().double_value
 
     def cmd_vel_callback(self, msg: Twist) -> None:
         position = self.curr_pose.position
         self.curr_pose.position = Point(
-            x=position.x + self.timer_period * msg.linear.x,
-            y=position.y + self.timer_period * msg.linear.y,
-            z=position.z + self.timer_period * msg.linear.z,
+            x=position.x + self.sampling_time * msg.linear.x,
+            y=position.y + self.sampling_time * msg.linear.y,
+            z=position.z + self.sampling_time * msg.linear.z,
         )
-        quat = self.curr_pose.orientation
-        _, _, yaw = euler_from_quaternion(quaternion=[quat.x, quat.y, quat.z, quat.w])
+        orientation = self.curr_pose.orientation
+        _, _, yaw = euler_from_quaternion(quaternion=[orientation.x, orientation.y, orientation.z, orientation.w])
 
-        quat = quaternion_from_euler(ai=0, aj=0, ak=yaw + self.timer_period * msg.angular.z)
-        self.curr_pose.orientation = Quaternion(x=quat[0], y=quat[1], z=quat[2], w=quat[3])
+        orientation_array = quaternion_from_euler(ai=0, aj=0, ak=yaw + self.sampling_time * msg.angular.z)
+        self.curr_pose.orientation = Quaternion(
+            x=orientation_array[0],
+            y=orientation_array[1],
+            z=orientation_array[2],
+            w=orientation_array[3],
+        )
         self.curr_pose_pub.publish(self.curr_pose)
 
         transform_stamped = TransformStamped(
@@ -70,12 +67,14 @@ class AgentBody(Node):
 def main() -> None:
     rclpy.init()
     agent_body = AgentBody()
+
     try:
         rclpy.spin(agent_body)
     except Exception as e:
-        print(e)
-
-    rclpy.shutdown()
+        agent_body.get_logger().error(f"{e}")
+    finally:
+        agent_body.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == "__main__":

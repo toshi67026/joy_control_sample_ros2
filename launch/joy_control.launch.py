@@ -12,11 +12,9 @@ from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     pkg_dir = get_package_share_directory("joy_control_sample_ros2")
-    params = LaunchConfiguration("params", default=os.path.join(pkg_dir, "simple.yaml"))
+    params = LaunchConfiguration("params", default=os.path.join(pkg_dir, "joy_control.yaml"))
 
-    rviz_config = LaunchConfiguration(
-        "rviz_config", default=os.path.join(pkg_dir, "display.rviz")
-    )
+    rviz2_config = LaunchConfiguration("rviz2_config", default=os.path.join(pkg_dir, "joy_control.rviz"))
 
     joy_node = Node(package="joy", executable="joy_node", name="joy_node")
 
@@ -39,7 +37,7 @@ def generate_launch_description() -> LaunchDescription:
         executable="rviz2",
         name="rviz2",
         output="screen",
-        arguments=["-d", rviz_config],
+        arguments=["-d", rviz2_config],
     )
 
     # Create the launch description and populate
