@@ -1,11 +1,9 @@
 controller:
   ros__parameters:
-    world_frame: 'world'
-    agent_frame: 'agent'
     timer_period: 0.01
 
 agent_body:
   ros__parameters:
-    world_frame: 'world'
-    agent_frame: 'agent'
+    world_frame: "world"
+    agent_frame: "agent"
     sampling_time: 0.01
