@@ -1,0 +1,7 @@
+numpy==1.22.3
+
+black==22.3.0
+mypy==0.942
+
+--extra-index-url https://rospypi.github.io/simple/
+ros-stubs-all
