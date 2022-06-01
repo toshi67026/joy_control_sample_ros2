@@ -13,22 +13,25 @@ class AgentBody(Node):
     def __init__(self) -> None:
         super().__init__("agent_body")
 
-        self.cmd_vel_sub = self.create_subscription(Twist, "cmd_vel", self.cmd_vel_callback, 10)
-        self.curr_pose_pub = self.create_publisher(Pose, "curr_pose", 10)
-        self.curr_pose = Pose()
-
         # get frame name
-        self.declare_parameter("world_frame", "world")
+        self.declare_parameter(name="world_frame", value="world")
         self.world_frame = self.get_parameter("world_frame").get_parameter_value().string_value
-        self.declare_parameter("agent_frame", "agent")
+        self.declare_parameter("agent_frame", "base_link")
         self.agent_frame = self.get_parameter("agent_frame").get_parameter_value().string_value
 
         # tf2
         self.tf_buffer = Buffer()
         self.broadcaster = TransformBroadcaster(self)
 
-        self.declare_parameter("sampling_time", 0.01)
+        self.curr_pose = Pose()
+        self.declare_parameter("sampling_time", 0.1)
         self.sampling_time = self.get_parameter("sampling_time").get_parameter_value().double_value
+
+        # pub
+        self.curr_pose_pub = self.create_publisher(Pose, "curr_pose", 10)
+
+        # sub
+        self.create_subscription(Twist, "cmd_vel", self.cmd_vel_callback, 10)
 
     def cmd_vel_callback(self, msg: Twist) -> None:
         position = self.curr_pose.position
