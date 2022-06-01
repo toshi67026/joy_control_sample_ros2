@@ -12,16 +12,21 @@ class Controller(Node):
     def __init__(self) -> None:
         super().__init__("controller")
 
-        self.joy_sub = self.create_subscription(Joy, "joy", self.joy_callback, 10)
-        self.curr_pose_sub = self.create_subscription(Pose, "curr_pose", self.curr_pose_callback, 10)
-
-        self.declare_parameter("timer_period", 0.01)
+        self.declare_parameter("timer_period", 0.1)
         self.timer_period = self.get_parameter("timer_period").get_parameter_value().double_value
-        self.timer = self.create_timer(self.timer_period, self.timer_callback)
 
-        self.cmd_vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
         self.cmd_vel_in_agent = Twist()
         self.cmd_vel_in_world = Twist()
+
+        # pub
+        self.cmd_vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
+
+        # sub
+        self.create_subscription(Joy, "joy", self.joy_callback, 10)
+        self.create_subscription(Pose, "curr_pose", self.curr_pose_callback, 10)
+
+        # timer
+        self.create_timer(self.timer_period, self.timer_callback)
 
     def joy_callback(self, msg: Joy) -> None:
         # invert value of x to match your vision
